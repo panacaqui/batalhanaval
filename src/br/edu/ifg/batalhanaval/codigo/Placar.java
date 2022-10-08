@@ -79,7 +79,7 @@ public class Placar {
 
     @Override
     public String toString() {
-        return String.format("Jogador: %s - %d pontos (Dficuldade: %s)", jogador, pontos, dificuldade);
+        return String.format("Jogador: %s - %d pontos (Dficuldade: %s)\n", jogador, pontos, dificuldade);
     }
 
 }

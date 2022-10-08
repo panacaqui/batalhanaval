@@ -1,1 +1,1 @@
-Versão inicial do jogo, sem interface gráfica, apenas a lógica.
+Versão de teste do jogo, com interface gráfica, apenas faltando "polimentos".

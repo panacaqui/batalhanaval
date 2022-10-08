@@ -6,7 +6,6 @@ package br.edu.ifg.batalhanaval.codigo;
  * @date 19/05/2018
  */
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,6 +20,7 @@ public class Jogo {
     private final ArrayList<ArrayList<String>> tabuleiro = new ArrayList<>();
     private int navios = 0;
     private Placar placar;
+    private int pontosVidas;
 
     /**
      * Construtor padrao;
@@ -31,8 +31,11 @@ public class Jogo {
     public Jogo(int dificuldade, Placar placar) {
         this.placar = placar;
         this.dificuldade = dificuldade;
-        montaTabuleiro();
-        iniciaJogo();
+
+        geraTabuleiro();
+        geraNavios();
+        geraBombas();
+        geraAgua();
     }
 
     /**
@@ -56,40 +59,38 @@ public class Jogo {
             int posicaoX = (int) (Math.random() * 10 + 0);
             int tamanho = (int) (Math.random() * 3 + 1);
 
-            // Verifica se a posicao tá ocupada;
             if (tabuleiro.get(posicaoY).get(posicaoX) == null) {
-                // Primeira posicao do navio;
-                tabuleiro.get(posicaoY).set(posicaoX, "O");
-                navios++;
-                // Verifica o tamanho dos navios;
                 switch (tamanho) {
                     case 1:
                         i++;
+                        tabuleiro.get(posicaoY).set(posicaoX, "1");
+                        navios++;
                         break;
                     case 2:
-                        if (verificaNavioDeTamanho2(posicaoY, posicaoX + 1, tamanho)) {
+                        if (verificaNavioDeTamanho2(posicaoY, posicaoX + 1, "")) {
+                            tabuleiro.get(posicaoY).set(posicaoX, "21");
                             i++;
-                        } else if (verificaNavioDeTamanho2(posicaoY + 1, posicaoX, tamanho)) {
+                            navios++;
+                        } else if (verificaNavioDeTamanho2(posicaoY + 1, posicaoX, "v")) {
+                            tabuleiro.get(posicaoY).set(posicaoX, "v21");
                             i++;
-                        } else if (verificaNavioDeTamanho2(posicaoY, posicaoX - 1, tamanho)) {
-                            i++;
-                        } else if (verificaNavioDeTamanho2(posicaoY - 1, posicaoX, tamanho)) {
-                            i++;
+                            navios++;
                         }
                         break;
                     case 3:
-                        if (verificaNavioDeTamanho3(posicaoY, posicaoX + 1, posicaoY, posicaoX + 2, tamanho)) {
+                        if (verificaNavioDeTamanho3(posicaoY, posicaoX + 1, posicaoY, posicaoX + 2, "")) {
+                            tabuleiro.get(posicaoY).set(posicaoX, "31");
                             i++;
-                        } else if (verificaNavioDeTamanho3(posicaoY + 1, posicaoX, posicaoY + 2, posicaoX, tamanho)) {
+                            navios++;
+                        } else if (verificaNavioDeTamanho3(posicaoY + 1, posicaoX, posicaoY + 2, posicaoX, "v")) {
+                            tabuleiro.get(posicaoY).set(posicaoX, "v31");
                             i++;
-                        } else if (verificaNavioDeTamanho3(posicaoY, posicaoX - 1, posicaoY, posicaoX - 2, tamanho)) {
-                            i++;
-                        } else if (verificaNavioDeTamanho3(posicaoY - 1, posicaoX, posicaoY - 2, posicaoX, tamanho)) {
-                            i++;
+                            navios++;
                         }
                         break;
                     default:
                         break;
+
                 }
             }
         }
@@ -104,10 +105,10 @@ public class Jogo {
      * @param tamanho
      * @return
      */
-    private boolean verificaNavioDeTamanho2(int posicaoY, int posicaoX, int tamanho) {
+    private boolean verificaNavioDeTamanho2(int posicaoY, int posicaoX, String tamanho) {
         if (posicaoY < tabuleiro.size() && posicaoX < tabuleiro.get(posicaoY).size()) {
             if (tabuleiro.get(posicaoY).get(posicaoX) == null) {
-                tabuleiro.get(posicaoY).set(posicaoX, "O");
+                tabuleiro.get(posicaoY).set(posicaoX, tamanho + "22");
                 navios++;
                 return true;
             }
@@ -127,14 +128,14 @@ public class Jogo {
      * @param tamanho
      * @return
      */
-    private boolean verificaNavioDeTamanho3(int posicaoY1, int posicaoX1, int posicaoY2, int posicaoX2, int tamanho) {
+    private boolean verificaNavioDeTamanho3(int posicaoY1, int posicaoX1, int posicaoY2, int posicaoX2, String tamanho) {
         if (posicaoY1 < tabuleiro.size() && posicaoX1 < tabuleiro.get(posicaoY1).size() && posicaoY2 < tabuleiro.size() && posicaoX2 < tabuleiro.get(posicaoY2).size()) {
             if (tabuleiro.get(posicaoY1).get(posicaoX1) == null && tabuleiro.get(posicaoY2).get(posicaoX2) == null) {
                 // Segunda casa do navio;
-                tabuleiro.get(posicaoY1).set(posicaoX1, "O");
+                tabuleiro.get(posicaoY1).set(posicaoX1, tamanho + "32");
                 navios++;
                 // Terceira casa do navio;
-                tabuleiro.get(posicaoY2).set(posicaoX2, "O");
+                tabuleiro.get(posicaoY2).set(posicaoX2, tamanho + "33");
                 navios++;
                 return true;
             }
@@ -174,16 +175,6 @@ public class Jogo {
     }
 
     /**
-     * Funcao que chama as outras funcoes para montar o tabuleiro;
-     */
-    private void montaTabuleiro() {
-        geraTabuleiro();
-        geraNavios();
-        geraBombas();
-        geraAgua();
-    }
-
-    /**
      *
      * @return
      */
@@ -216,59 +207,93 @@ public class Jogo {
     }
 
     /**
-     * Todo o jogo;
-     */
-    public void iniciaJogo() {
-        while (vidas > 0) {
-            if (navios == 0) {
-                JOptionPane.showMessageDialog(null, "PARABENS! VOCÊ VENCEU!!!!");
-                return;
-            }
-
-            String info = String.format("Jogador: %s - Pontos: %d Vidas: %d\n\n%s", placar.getJogador(), placar.getPontos(), vidas, mostraTabuleiro());
-            int x = Integer.parseInt(JOptionPane.showInputDialog(info + "Posição Vertical"));
-            int y = Integer.parseInt(JOptionPane.showInputDialog(info + "Posição Horizontal"));
-
-            if (tabuleiro.get(x).get(y).equals("X")) {
-                JOptionPane.showMessageDialog(null, "Você já marcou essa posição, por favor, selecione outra!");
-            }
-
-            if (tabuleiro.get(x).get(y).equals("*")) {
-                vidas--;
-                if (placar.getPontos() - 10 > 0) {
-                    placar.setPontos(placar.getPontos() - 10);
-                } else {
-                    placar.setPontos(0);
-                }
-                tabuleiro.get(x).set(y, "X");
-            }
-
-            if (tabuleiro.get(x).get(y).equals("O")) {
-                placar.setPontos(placar.getPontos() + 20);
-                tabuleiro.get(x).set(y, "X");
-                navios--;
-            }
-
-            if (tabuleiro.get(x).get(y).equals("-")) {
-                tabuleiro.get(x).set(y, "X");
-            }
-        }
-        JOptionPane.showMessageDialog(null, "GAME OVER!\nSuas vidas acabaram");
-    }
-
-    /**
-     * Funcao que mostra o tabuleiro para a parte lógica;
      *
      * @return
      */
-    private String mostraTabuleiro() {
-        String tab = "";
-        for (ArrayList<String> aux : tabuleiro) {
-            for (String objeto : aux) {
-                tab += objeto + "      ";
-            }
-            tab += "\n";
-        }
-        return tab;
+    public int getVidas() {
+        return vidas;
     }
+
+    /**
+     *
+     * @param vidas
+     */
+    public void setVidas(int vidas) {
+        this.vidas = vidas;
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    public String jogar(int x, int y) {
+        // bomba
+        if (tabuleiro.get(x).get(y).equals("*")) {
+            vidas--;
+            if (placar.getPontos() - 10 > 0) {
+                placar.setPontos(placar.getPontos() - 10);
+            } else {
+                placar.setPontos(0);
+            }
+            tabuleiro.get(x).set(y, "X");
+            return "5";
+        }
+
+        // Agua
+        if (tabuleiro.get(x).get(y).equals("-")) {
+            tabuleiro.get(x).set(y, "X");
+            return "6";
+        }
+
+        // Navio
+        String navio = tabuleiro.get(x).get(y);
+        if (navio.equals("1") || navio.equals("21") || navio.equals("22") || navio.equals("31") || navio.equals("32") || navio.equals("33") || navio.equals("v21") || navio.equals("v22") || navio.equals("v31") || navio.equals("v32") || navio.equals("v33")) {
+            placar.setPontos(placar.getPontos() + 20);
+            pontosVidas += 20;
+            tabuleiro.get(x).set(y, "X");
+            navios--;
+            return navio;
+        }
+
+        return "7";
+    }
+
+    public String mostraTabuleiro(int x, int y) {
+        // bomba
+        if (tabuleiro.get(x).get(y).equals("*")) {
+            return "5";
+        }
+
+        // Agua
+        if (tabuleiro.get(x).get(y).equals("-")) {
+            return "6";
+        }
+
+        // Navio
+        String navio = tabuleiro.get(x).get(y);
+        if (navio.equals("1") || navio.equals("21") || navio.equals("22") || navio.equals("31") || navio.equals("32") || navio.equals("33") || navio.equals("v21") || navio.equals("v22") || navio.equals("v31") || navio.equals("v32") || navio.equals("v33")) {
+            return navio;
+        }
+
+        return "7";
+    }
+
+    public int getPontosVidas() {
+        return pontosVidas;
+    }
+
+    public void setPontosVidas(int pontosVidas) {
+        this.pontosVidas = pontosVidas;
+    }
+
+    public int getNavios() {
+        return navios;
+    }
+
+    public void setNavios(int navios) {
+        this.navios = navios;
+    }
+
 }
