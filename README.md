@@ -1,2 +1,1 @@
-# batalhanaval
-Jogo de batalha naval misturado com campo minado
+Versão inicial do jogo, sem interface gráfica, apenas a lógica.
